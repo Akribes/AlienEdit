@@ -101,6 +101,8 @@ int main(int argc, char **argv) {
 		}
 	}
 
+	writeToFile(); // TODO add save feature and remove this
+
 	clear();
 	endwin();
 	return 0;
@@ -188,9 +190,7 @@ void writeToFile() {
 	std::ofstream out;
 	out.open(file);
 	for (auto &line : buffer) {
-		out<<line;
+		out<<line<<'\n';
 	}
-	
-	if (buffer.back().back() != '\n') out<<'\n';
 	out.close();
 }
