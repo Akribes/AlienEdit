@@ -1,3 +1,5 @@
+#include "utils.h"
+
 #include <ncurses.h>
 #include <string>
 #include <vector>
@@ -7,19 +9,20 @@
 
 void initializeWindows();
 void createWindows();
-void handleResize();
+void recreateWindows();
 
 void refreshStatus();
 void refreshEditor(bool forceRedraw = false);
+void refreshLineNumbers();
 
 void readFromFile();
 void writeToFile();
 
-WINDOW *editor, *menu, *status;
+WINDOW *editor, *lineNumbers, *menu, *status;
 
 std::string file;
 std::vector<std::string> buffer;
-int line, column, firstLine, firstColumn, lines, columns, height, width;
+int line, column, firstLine, firstColumn, lines, columns, height, width, lineNumbersWidth;
 
 int main(int argc, char **argv) {
 	line, column, firstLine, firstColumn = 0;
@@ -29,16 +32,16 @@ int main(int argc, char **argv) {
 		readFromFile();
 	}
 
-	initializeWindows();
-	
 	if (buffer.size() == 0) buffer.push_back("");
+	
+	initializeWindows();
 
 	bool run = true;
 	while (run) {
 		int ch = wgetch(editor);
 		switch(ch) {
 			case KEY_RESIZE:
-				handleResize();
+				recreateWindows();
 				break;
 			case KEY_DC: // TODO use something else to exit and make this remove the character after the cursor
 				run = false;
@@ -54,6 +57,9 @@ int main(int argc, char **argv) {
 				} else if (column > 0) {
 					buffer[line].erase(buffer[line].begin() + --column);
 				} else break;
+				
+				if (digitCount(buffer.size()) != digitCount(buffer.size() + 1)) recreateWindows();
+				
 				refreshEditor(true);
 				refreshStatus();
 				break;
@@ -62,6 +68,9 @@ int main(int argc, char **argv) {
 				buffer[line].erase(column);
 				++line;
 				column = 0;
+
+				if (digitCount(buffer.size()) != digitCount(buffer.size() - 1)) recreateWindows();
+
 				refreshEditor(true);
 				refreshStatus();
 				break;
@@ -123,12 +132,15 @@ void initializeWindows() {
 void createWindows() {
 	getmaxyx(stdscr, height, width);
 
+	lineNumbersWidth = digitCount(buffer.size());
 	lines = height - 2;
-	columns = width;
-
-	editor = newwin(lines, width, 0, 0);
-	refreshEditor();
+	columns = width - lineNumbersWidth - 1;
 	
+	lineNumbers = newwin(lines, lineNumbersWidth + 1, 0, 0);
+
+	editor = newwin(lines, columns, 0, lineNumbersWidth + 1);
+	refreshEditor(true);
+
 	menu = newwin(1, width, height - 2, 0);
 	waddstr(menu, "Eventually I will put a menu down here. For now, press Delete to exit. This is just a placeholder with some text so you can see that this exists.");
 	wrefresh(menu);
@@ -140,8 +152,10 @@ void createWindows() {
 	keypad(editor, TRUE);
 }
 
-void handleResize() {
+void recreateWindows() {
 	delwin(editor);
+	delwin(lineNumbers);
+	delwin(status);
 	delwin(menu);
 	createWindows();
 }
@@ -172,9 +186,18 @@ void refreshEditor(bool forceRedraw) {
 			std::string &part = buffer[i];
 			if (part.length() > firstColumn) mvwaddstr(editor, i - firstLine, 0, part.substr(firstColumn, width).c_str());
 		}
+		refreshLineNumbers();
 	}
 
 	wmove(editor, line - firstLine, column - firstColumn);
+}
+
+void refreshLineNumbers() {
+	werase(lineNumbers);
+	for (int i = 0; i < lines && i < buffer.size(); ++i) {
+		mvwaddstr(lineNumbers, i, lineNumbersWidth - digitCount(i + firstLine + 1), std::to_string(i + firstLine + 1).c_str());
+	}
+	wrefresh(lineNumbers);
 }
 
 void readFromFile() {
