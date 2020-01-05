@@ -1,24 +1,6 @@
-#include "utils.h"
+#include "alienedit.h"
 
-#include <ncurses.h>
-#include <string>
-#include <vector>
-#include <fstream>
-#include <sstream>
-#include <algorithm>
-
-void initializeWindows();
-void createWindows();
-void recreateWindows();
-
-void refreshStatus();
-void refreshEditor(bool forceRedraw = false);
-void refreshLineNumbers();
-
-void readFromFile();
-void writeToFile();
-
-WINDOW *editor, *lineNumbers, *menu, *status;
+WINDOW *editor, *lineNumbers, *menuBar, *statusBar;
 
 std::string file;
 std::vector<std::string> buffer;
@@ -34,7 +16,7 @@ int main(int argc, char **argv) {
 
 	if (buffer.size() == 0) buffer.push_back("");
 	
-	initializeWindows();
+	initialise();
 
 	bool run = true;
 	while (run) {
@@ -117,7 +99,9 @@ int main(int argc, char **argv) {
 	return 0;
 }
 
-void initializeWindows() {
+void initialise() {
+	createMenu();
+
 	initscr();
 	start_color();
 	cbreak();
@@ -125,7 +109,7 @@ void initializeWindows() {
 	clear();
 
 	init_pair(1, COLOR_BLACK, COLOR_WHITE);
-
+	
 	createWindows();
 }
 
@@ -141,12 +125,13 @@ void createWindows() {
 	editor = newwin(lines, columns, 0, lineNumbersWidth + 1);
 	refreshEditor(true);
 
-	menu = newwin(1, width, height - 2, 0);
-	waddstr(menu, "Eventually I will put a menu down here. For now, press Delete to exit. This is just a placeholder with some text so you can see that this exists.");
-	wrefresh(menu);
+	menuBar = newwin(1, width, height - 2, 0);
+	refreshMenu();
+	//waddstr(menuBar, "Eventually I will put a menu down here. For now, press Delete to exit. This is just a placeholder with some text so you can see that this exists.");
+	wrefresh(menuBar);
 
-	status = newwin(1, width, height - 1, 0);
-	wbkgd(status, COLOR_PAIR(1));
+	statusBar = newwin(1, width, height - 1, 0);
+	wbkgd(statusBar, COLOR_PAIR(1));
 	refreshStatus();
 	
 	keypad(editor, TRUE);
@@ -155,18 +140,18 @@ void createWindows() {
 void recreateWindows() {
 	delwin(editor);
 	delwin(lineNumbers);
-	delwin(status);
-	delwin(menu);
+	delwin(statusBar);
+	delwin(menuBar);
 	createWindows();
 }
 
 void refreshStatus() {
-	werase(status);
-	mvwaddstr(status, 0, 0, file.c_str());
+	werase(statusBar);
+	mvwaddstr(statusBar, 0, 0, file.c_str());
 	std::ostringstream pos;
 	pos<<"("<<line + 1<<";"<<column + 1<<")"; // + 1, because line numbers should start at 1
-	mvwaddstr(status, 0, width - pos.tellp(), pos.str().c_str());
-	wrefresh(status);
+	mvwaddstr(statusBar, 0, width - pos.tellp(), pos.str().c_str());
+	wrefresh(statusBar);
 }
 
 void refreshEditor(bool forceRedraw) {
