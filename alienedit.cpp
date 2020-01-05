@@ -127,7 +127,6 @@ void createWindows() {
 
 	menuBar = newwin(1, width, height - 2, 0);
 	refreshMenu();
-	//waddstr(menuBar, "Eventually I will put a menu down here. For now, press Delete to exit. This is just a placeholder with some text so you can see that this exists.");
 	wrefresh(menuBar);
 
 	statusBar = newwin(1, width, height - 1, 0);
