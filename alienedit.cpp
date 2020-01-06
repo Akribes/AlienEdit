@@ -2,6 +2,8 @@
 
 WINDOW *editor, *lineNumbers, *menuBar, *statusBar;
 
+bool isRunning;
+
 std::string file;
 std::vector<std::string> buffer;
 int line, column, firstLine, firstColumn, lines, columns, height, width, lineNumbersWidth;
@@ -18,16 +20,43 @@ int main(int argc, char **argv) {
 	
 	initialise();
 
-	bool run = true;
-	while (run) {
+	isRunning = true;
+	while (isRunning) {
 		int ch = wgetch(editor);
+
 		switch(ch) {
 			case KEY_RESIZE:
 				recreateWindows();
 				break;
-			case KEY_DC: // TODO use something else to exit and make this remove the character after the cursor
-				run = false;
+			case 27: // Escape
+				menuActive = !menuActive;
+				if (menuActive) selection = 0;
+				refreshMenu();
 				break;
+		}
+
+		if (menuActive) {
+			switch(ch) {
+				case 10: // Enter
+					mainMenu[selection].second();
+					menuActive = false;
+					break;
+				case KEY_LEFT:
+				case KEY_UP:
+					selection = (selection - 1) % mainMenu.size();
+					break;
+				case KEY_RIGHT:
+				case KEY_DOWN:
+					selection = (selection + 1) % mainMenu.size();
+					break;
+				default:
+					continue;
+			}
+			refreshMenu();
+			continue;
+		}
+
+		switch (ch) {
 			case 8: // Backspace
 			case 127:
 			case 263:
@@ -92,8 +121,6 @@ int main(int argc, char **argv) {
 		}
 	}
 
-	writeToFile(); // TODO add save feature and remove this
-
 	clear();
 	endwin();
 	return 0;
@@ -106,6 +133,7 @@ void initialise() {
 	start_color();
 	cbreak();
 	noecho();
+	set_escdelay(50);
 	clear();
 
 	init_pair(1, COLOR_BLACK, COLOR_WHITE);

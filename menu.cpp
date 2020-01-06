@@ -10,7 +10,7 @@ namespace menu {
 	}
 
 	void exit() {
-		werase(editor);
+		isRunning = false;
 	}
 }
 
@@ -20,13 +20,14 @@ void createMenu() {
 }
 
 void refreshMenu() {
-	selection = 0;
 	werase(menuBar);
 	wmove(menuBar, 0, 0);
 	for (int i = 0; i < mainMenu.size(); ++i) {
 		if (i != 0) waddch(menuBar, ' ');
-		if (!menuActive || i != selection) wattron(menuBar, COLOR_PAIR(1));
+		if (menuActive && selection == i) wattron(menuBar, COLOR_PAIR(1));
 		waddstr(menuBar, mainMenu[i].first.c_str());
 		wattroff(menuBar, COLOR_PAIR(1));
 	}
+	wrefresh(menuBar);
+	wrefresh(editor); // Move back cursor
 }

@@ -10,6 +10,8 @@
 #include <sstream>
 #include <utility>
 
+extern bool isRunning;
+
 extern std::string file;
 extern std::vector<std::string> buffer;
 
