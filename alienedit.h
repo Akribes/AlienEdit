@@ -23,6 +23,8 @@ extern int selection;
 
 extern int height, width, lineNumbersWidth, line, column, lines, columns, firstLine, firstColumn;
 
+extern bool unsavedChanges;
+
 void initialise();
 void createWindows();
 void recreateWindows();

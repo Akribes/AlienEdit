@@ -8,6 +8,8 @@ std::string file;
 std::vector<std::string> buffer;
 int line, column, firstLine, firstColumn, lines, columns, height, width, lineNumbersWidth;
 
+bool unsavedChanges = false;
+
 int main(int argc, char **argv) {
 	line, column, firstLine, firstColumn = 0;
 
@@ -72,6 +74,7 @@ int main(int argc, char **argv) {
 				if (digitCount(buffer.size()) != digitCount(buffer.size() + 1)) recreateWindows();
 				
 				refreshEditor(true);
+				unsavedChanges = true;
 				refreshStatus();
 				break;
 			case 10: // Enter
@@ -83,6 +86,7 @@ int main(int argc, char **argv) {
 				if (digitCount(buffer.size()) != digitCount(buffer.size() - 1)) recreateWindows();
 
 				refreshEditor(true);
+				unsavedChanges = true;
 				refreshStatus();
 				break;
 			case KEY_UP:
@@ -117,6 +121,7 @@ int main(int argc, char **argv) {
 				buffer[line].insert(buffer[line].begin() + column - 1, ch);
 
 				refreshEditor(true); // Redraw, so ncurses doesn't overwrite other characters
+				unsavedChanges = true;
 				refreshStatus();
 		}
 	}
@@ -175,6 +180,7 @@ void recreateWindows() {
 void refreshStatus() {
 	werase(statusBar);
 	mvwaddstr(statusBar, 0, 0, file.c_str());
+	if (unsavedChanges) waddch(statusBar, '*');
 	std::ostringstream pos;
 	pos<<"("<<line + 1<<";"<<column + 1<<")"; // + 1, because line numbers should start at 1
 	mvwaddstr(statusBar, 0, width - pos.tellp(), pos.str().c_str());
@@ -228,4 +234,7 @@ void writeToFile() {
 		out<<line<<'\n';
 	}
 	out.close();
+	
+	unsavedChanges = false;
+	refreshStatus();
 }
