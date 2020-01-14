@@ -24,9 +24,9 @@ void refreshMenu() {
 	wmove(menuBar, 0, 0);
 	for (int i = 0; i < mainMenu.size(); ++i) {
 		if (i != 0) waddch(menuBar, ' ');
-		if (menuActive && selection == i) wattron(menuBar, COLOR_PAIR(1));
+		if (menuActive && selection == i) wattron(menuBar, A_REVERSE);
 		waddstr(menuBar, mainMenu[i].first.c_str());
-		wattroff(menuBar, COLOR_PAIR(1));
+		wattroff(menuBar, A_REVERSE);
 	}
 	wrefresh(menuBar);
 	wrefresh(editor); // Move back cursor

@@ -130,14 +130,11 @@ void initialise() {
 	createMenu();
 
 	initscr();
-	start_color();
 	cbreak();
 	noecho();
 	set_escdelay(50);
 	clear();
 
-	init_pair(1, COLOR_BLACK, COLOR_WHITE);
-	
 	createWindows();
 }
 
@@ -158,10 +155,13 @@ void createWindows() {
 	wrefresh(menuBar);
 
 	statusBar = newwin(1, width, height - 1, 0);
-	wbkgd(statusBar, COLOR_PAIR(1));
+	wbkgd(statusBar, A_REVERSE);
 	refreshStatus();
 	
 	keypad(editor, TRUE);
+
+	// Move cursor back to editor
+	wmove(editor, line - firstLine, column - firstColumn);
 }
 
 void recreateWindows() {
