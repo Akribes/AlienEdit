@@ -9,7 +9,7 @@ alienedit: alienedit.o utils.o menu.o
 
 .PHONY: clean install uninstall
 clean:
-	rm alienedit.o utils.o menu.o
+	rm alienedit.o utils.o menu.o alienedit
 
 install: alienedit
 	install alienedit $(PREFIX)/bin/alienedit
