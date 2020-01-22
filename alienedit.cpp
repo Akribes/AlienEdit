@@ -202,7 +202,7 @@ void refreshEditor(bool forceRedraw) {
 		int lastLine = firstLine + lines;
 		for (int i = firstLine; i < buffer.size() && i < lastLine; ++i) {
 			std::string &part = buffer[i];
-			if (part.length() > firstColumn) mvwaddstr(editor, i - firstLine, 0, part.substr(firstColumn, width).c_str());
+			if (part.length() > firstColumn) mvwaddstr(editor, i - firstLine, 0, part.substr(firstColumn, columns).c_str());
 		}
 		refreshLineNumbers();
 	}
