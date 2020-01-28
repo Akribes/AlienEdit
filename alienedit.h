@@ -4,7 +4,6 @@
 #include <ncurses.h>
 #include <string>
 #include <vector>
-#include <cmath>
 #include <algorithm>
 #include <fstream>
 #include <sstream>
@@ -36,8 +35,6 @@ void refreshMenu();
 
 void readFromFile();
 void writeToFile();
-
-int digitCount(int n);
 
 void createMenu();
 

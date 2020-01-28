@@ -1,4 +1,5 @@
 #include "alienedit.h"
+#include "utils.h"
 
 WINDOW *editor, *lineNumbers, *menuBar, *statusBar;
 
