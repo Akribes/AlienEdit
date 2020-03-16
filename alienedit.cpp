@@ -102,16 +102,6 @@ void resizeWindows() {
 	lineNumbers->resize(Vector2(0, 0), Vector2(lineNumbersWidth, height - 2));
 }
 
-void refreshStatus() {
-	/*werase(statusBar);
-	mvwaddstr(statusBar, 0, 0, file.c_str());
-	if (unsavedChanges) waddch(statusBar, '*');
-	std::ostringstream pos;
-	pos<<"("<<line + 1<<";"<<column + 1<<")"; // + 1, because line numbers should start at 1
-	mvwaddstr(statusBar, 0, width - pos.tellp(), pos.str().c_str());
-	wrefresh(statusBar);*/
-}
-
 void readFromFile() {
 	std::ifstream in;
 	in.open(file);
@@ -130,5 +120,5 @@ void writeToFile() {
 	out.close();
 	
 	statusBar->unsavedChanges = false;
-	refreshStatus();
+	statusBar->refresh();
 }
