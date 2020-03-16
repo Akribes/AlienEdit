@@ -48,7 +48,7 @@ int Editor::acceptInput(bool menuActive) {
 
 			if (digitCount(buf->size()) != digitCount(buf->size() + 1)) resizeWindows();
 			refresh(true);
-			statusBar->unsavedChanges = false;
+			statusBar->unsavedChanges = true;
 			break;
 		case KEY_DC:
 			if (cursor.x < (*buf)[cursor.y].length()) {
@@ -60,7 +60,7 @@ int Editor::acceptInput(bool menuActive) {
 
 			if (digitCount(buf->size()) != digitCount(buf->size() + 1)) resizeWindows();
 			refresh(true);
-			statusBar->unsavedChanges = false;
+			statusBar->unsavedChanges = true;
 			break;
 		case 10: // Enter
 		case KEY_ENTER:
@@ -71,7 +71,7 @@ int Editor::acceptInput(bool menuActive) {
 
 			if (digitCount(buf->size()) != digitCount(buf->size() - 1)) resizeWindows();
 			refresh(true);
-			statusBar->unsavedChanges = false;
+			statusBar->unsavedChanges = true;
 			break;
 		case KEY_UP:
 			if (cursor.y <= 0) break;
@@ -98,7 +98,7 @@ int Editor::acceptInput(bool menuActive) {
 			(*buf)[cursor.y].insert(cursor.x, "\t"); // TODO make tabs or spaces configurable
 			++cursor.x;
 			refresh(true);
-			statusBar->unsavedChanges = false;
+			statusBar->unsavedChanges = true;
 			break;
 		default:
 			std::string key = std::string(keyname(ch));
@@ -108,7 +108,7 @@ int Editor::acceptInput(bool menuActive) {
 			(*buf)[cursor.y].insert((*buf)[cursor.y].begin() + cursor.x, ch);
 			++cursor.x;
 			refresh(true);
-			statusBar->unsavedChanges = false;
+			statusBar->unsavedChanges = true;
 	}
 	
 	statusBar->refresh();
