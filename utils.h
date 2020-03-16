@@ -2,13 +2,17 @@
 #define UTILS_H
 
 #include <cmath>
+#include <string>
 
-struct Position {
-	unsigned x;
-	unsigned y;
-	Position(unsigned x, unsigned y): x(x), y(y) {}
+struct Vector2 {
+	size_t x;
+	size_t y;
+	Vector2() {};
+	Vector2(size_t x, size_t y): x(x), y(y) {}
 };
 
-int digitCount(int n);
+size_t digitCount(size_t n);
+size_t tabOffset(const std::string &x, size_t end = std::string::npos);
+std::string convertTabs(const std::string &x);
 
 #endif // UTILS_H

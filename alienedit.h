@@ -1,41 +1,37 @@
 #ifndef ALIENEDIT_H
 #define ALIENEDIT_H
 
+#include "utils.h"
+#include "menubar.h"
+#include "statusbar.h"
+#include "editor.h"
+#include "linenumbers.h"
 #include <ncurses.h>
 #include <string>
 #include <vector>
 #include <algorithm>
 #include <fstream>
-#include <sstream>
 #include <utility>
 
 extern bool isRunning;
 
 extern std::string file;
-extern std::vector<std::string> buffer;
 
-extern WINDOW* editor, * lineNumbers, * menuBar, * statusBar;
-
-extern std::vector<std::pair<std::string, void(*)()> > mainMenu;
-extern bool menuActive;
-extern int selection;
-
-extern int height, width, lineNumbersWidth, line, column, lines, columns, firstLine, firstColumn;
-
-extern bool unsavedChanges;
+extern size_t height, width, lineNumbersWidth;
 
 void initialise();
 void createWindows();
-void recreateWindows();
+void resizeWindows();
 
 void refreshStatus();
-void refreshEditor(bool forceRedraw = false);
 void refreshLineNumbers();
-void refreshMenu();
 
 void readFromFile();
 void writeToFile();
 
-void createMenu();
+extern Editor *editor;
+extern MenuBar *menuBar;
+extern LineNumbers *lineNumbers;
+extern StatusBar *statusBar;
 
 #endif // ALIENEDIT_H
