@@ -13,25 +13,17 @@
 #include <fstream>
 #include <utility>
 
-extern bool isRunning;
-
-extern std::string file;
-
-extern size_t height, width, lineNumbersWidth;
-
-void initialise();
-void createWindows();
-void resizeWindows();
-
-void refreshStatus();
-void refreshLineNumbers();
-
-void readFromFile();
-void writeToFile();
-
 extern Editor *editor;
 extern MenuBar *menuBar;
 extern LineNumbers *lineNumbers;
 extern StatusBar *statusBar;
+
+extern bool isRunning;
+extern std::string file;
+
+void resizeWindows();
+
+void readFromFile();
+void writeToFile();
 
 #endif // ALIENEDIT_H

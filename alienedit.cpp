@@ -11,15 +11,24 @@ std::string file;
 std::vector<std::string> buffer;
 size_t height, width;
 
+void createWindows();
+
 int main(int argc, char **argv) {
 	if (argc > 1) {
 		file = argv[1];
 		readFromFile();
 	}
-
 	if (buffer.size() == 0) buffer.push_back("");
 	
-	initialise();
+	initscr();
+	cbreak();
+	noecho();
+	nl();
+	intrflush(stdscr, FALSE);
+	set_escdelay(50);
+	clear();
+
+	createWindows();
 
 	isRunning = true;
 	while (isRunning) {
@@ -57,18 +66,6 @@ int main(int argc, char **argv) {
 	endwin();
 
 	return 0;
-}
-
-void initialise() {
-	initscr();
-	cbreak();
-	noecho();
-	nl();
-	intrflush(stdscr, FALSE);
-	set_escdelay(50);
-	clear();
-
-	createWindows();
 }
 
 void createWindows() {
