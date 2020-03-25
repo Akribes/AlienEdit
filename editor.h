@@ -8,8 +8,8 @@
 
 class Editor: public Component {
 	public:
-		Editor(Vector2 position, Vector2 size, std::vector<std::string>* buffer);
-		void refresh(bool force = false);
+		Editor(AlienEdit &parent, Vector2 position, Vector2 size, std::vector<std::string> &buffer);
+		void refresh();
 		void focus();
 		int acceptInput(bool menuActive);
 
@@ -20,8 +20,10 @@ class Editor: public Component {
 		Vector2 start;
 		Vector2 cursor;
 
-		std::vector<std::string>* buf;
+		std::vector<std::string> &buf;
 		size_t taboffset();
 };
+
+#include "alienedit.h"
 
 #endif // EDITOR_H

@@ -7,13 +7,15 @@
 
 class LineNumbers: public Component {
 	public:
-		LineNumbers(Vector2 position, Vector2 size, std::vector<std::string> *buffer);
-		void refresh(bool force = false);
+		LineNumbers(AlienEdit &parent, Vector2 position, Vector2 size, std::vector<std::string> &buffer);
+		void refresh();
 	
 	private:
 		size_t start;
 		size_t current;
-		std::vector<std::string> *buf;
+		std::vector<std::string> &buf;
 };
+
+#include "alienedit.h"
 
 #endif // LINENUMBERS_H

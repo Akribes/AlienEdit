@@ -2,28 +2,43 @@
 #define ALIENEDIT_H
 
 #include "utils.h"
-#include "menubar.h"
-#include "statusbar.h"
-#include "editor.h"
-#include "linenumbers.h"
 #include <ncurses.h>
 #include <string>
 #include <vector>
 #include <algorithm>
 #include <fstream>
-#include <utility>
+#include <memory>
+#include "component.h"
+#include "editor.h"
+#include "linenumbers.h"
+#include "menubar.h"
+#include "statusbar.h"
 
-extern Editor *editor;
-extern MenuBar *menuBar;
-extern LineNumbers *lineNumbers;
-extern StatusBar *statusBar;
+class AlienEdit {
+	public:
+		std::unique_ptr<Editor> editor;
+		std::unique_ptr<MenuBar> menuBar;
+		std::unique_ptr<LineNumbers> lineNumbers;
+		std::unique_ptr<StatusBar> statusBar;
 
-extern bool isRunning;
-extern std::string file;
+		explicit AlienEdit(const std::string &file);
+		void start();
+		void stop();
 
-void resizeWindows();
+		void resizeWindows();
+		void queueRefresh(const Component *component);
+		void refresh();
+		void refreshAll();
 
-void readFromFile();
-void writeToFile();
+		std::string getFile();
+		void readFile();
+		void writeFile();
+
+	private:
+		bool running;
+		const std::string &file;
+		std::vector<std::string> buffer;
+		std::vector<const Component *> refreshQueue;
+};
 
 #endif // ALIENEDIT_H

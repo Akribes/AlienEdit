@@ -9,8 +9,10 @@ class StatusBar: public Component {
 	public:
 		bool unsavedChanges;
 
-		StatusBar(Vector2 position, Vector2 size);
-		void refresh(bool force = false);
+		StatusBar(AlienEdit &parent, Vector2 position, Vector2 size);
+		void refresh();
 };
+
+#include "alienedit.h"
 
 #endif // STATUSBAR_H

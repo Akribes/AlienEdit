@@ -14,13 +14,15 @@ class MenuBar: public Component {
 		size_t selection;
 		bool active;
 
-		MenuBar(Vector2 position, Vector2 size);
-		void refresh(bool force = false);
+		MenuBar(AlienEdit &parent, Vector2 position, Vector2 size);
+		void refresh();
 		bool toggle();
 		void confirm();
 		size_t options();
 	private:
 		Menu mainMenu;
 };
+
+#include "alienedit.h"
 
 #endif // MENUBAR_H

@@ -1,95 +1,78 @@
 #include "alienedit.h"
 
-Editor *editor;
-MenuBar *menuBar;
-LineNumbers *lineNumbers;
-StatusBar *statusBar;
+AlienEdit::AlienEdit(const std::string &file): file(file) {
+	running = false;
 
-bool isRunning;
-
-std::string file;
-std::vector<std::string> buffer;
-size_t height, width;
-
-void createWindows();
-
-int main(int argc, char **argv) {
-	if (argc > 1) {
-		file = argv[1];
-		readFromFile();
-	}
-	if (buffer.size() == 0) buffer.push_back("");
-	
+	// Ncurses stuff
 	initscr();
 	cbreak();
 	noecho();
 	nl();
 	intrflush(stdscr, FALSE);
 	set_escdelay(50);
-	clear();
 
-	createWindows();
+	// Read into buffer
+	readFile();
 
-	isRunning = true;
-	while (isRunning) {
+	// Create windows
+	int height, width;
+	getmaxyx(stdscr, height, width);
+	size_t lineNumbersWidth = digitCount(buffer.size());
+
+	editor = std::make_unique<Editor>(*this, Vector2(lineNumbersWidth + 1, 0), Vector2(width - lineNumbersWidth, height - 2), buffer);
+	lineNumbers = std::make_unique<LineNumbers>(*this, Vector2(0, 0), Vector2(lineNumbersWidth, height - 2), buffer);
+	menuBar = std::make_unique<MenuBar>(*this, Vector2(0, height - 2), Vector2(width, 1));
+	statusBar = std::make_unique<StatusBar>(*this, Vector2(0, height - 1), Vector2(width, 1));
+}
+
+void AlienEdit::start() {
+	running = true;
+
+	refreshAll();
+	while (running) {
 		int ch = editor->acceptInput(menuBar->active);
-		if (ch == OK) continue;
-
-		switch(ch) {
-			case KEY_RESIZE:
-				resizeWindows();
-				break;
-			case 27: // Escape
-				menuBar->toggle();
-				break;
-			case 10: // Enter
-				menuBar->confirm();
-				break;
-			case KEY_LEFT:
-			case KEY_UP:
-				menuBar->selection = (menuBar->selection - 1) % menuBar->options();
-				menuBar->refresh();
-				break;
-			case KEY_RIGHT:
-			case KEY_DOWN:
-				menuBar->selection = (menuBar->selection + 1) % menuBar->options();
-				menuBar->refresh();
-				break;
+		if (ch != OK) {
+			switch(ch) {
+				case KEY_RESIZE:
+					resizeWindows();
+					break;
+				case 27: // Escape
+					menuBar->toggle();
+					break;
+				case 10: // Enter
+					menuBar->confirm();
+					break;
+				case KEY_LEFT:
+				case KEY_UP:
+					menuBar->selection = (menuBar->selection - 1) % menuBar->options();
+					queueRefresh(menuBar.get());
+					break;
+				case KEY_RIGHT:
+				case KEY_DOWN:
+					menuBar->selection = (menuBar->selection + 1) % menuBar->options();
+					queueRefresh(menuBar.get());
+					break;
+			}
 		}
+		refresh();
 	}
 
-	delete editor;
-	delete lineNumbers;
-	delete menuBar;
-	delete statusBar;
+	editor->destroy();
+	menuBar->destroy();
+	statusBar->destroy();
+	lineNumbers->destroy();
+
 	clear();
+	refresh();
 	endwin();
-
-	return 0;
 }
 
-void createWindows() {
-	getmaxyx(stdscr, height, width);
-
-	size_t lineNumbersWidth = digitCount(buffer.size());
-	size_t lines = height - 2;
-	
-	editor = new Editor(Vector2(lineNumbersWidth + 1, 0), Vector2(width - lineNumbersWidth, height - 2), &buffer);
-	editor->refresh(true);
-
-	lineNumbers = new LineNumbers(Vector2(0, 0), Vector2(lineNumbersWidth, lines), &buffer);
-	lineNumbers->refresh();
-
-	menuBar = new MenuBar(Vector2(0, height - 2), Vector2(width, 1));
-	menuBar->refresh();
-
-	statusBar = new StatusBar(Vector2(0, height - 1), Vector2(width, 1));
-	statusBar->refresh();
-
-	editor->refresh();
+void AlienEdit::stop() {
+	running = false;
 }
 
-void resizeWindows() {
+void AlienEdit::resizeWindows() {
+	int height, width;
 	getmaxyx(stdscr, height, width);
 	size_t lineNumbersWidth = digitCount(buffer.size());
 
@@ -97,25 +80,54 @@ void resizeWindows() {
 	menuBar->resize(Vector2(0, height - 2), Vector2(width, 1));
 	statusBar->resize(Vector2(0, height - 1), Vector2(width, 1));
 	lineNumbers->resize(Vector2(0, 0), Vector2(lineNumbersWidth, height - 2));
+	refreshAll();
 }
 
-void readFromFile() {
+void AlienEdit::queueRefresh(const Component *component) {
+	refreshQueue.push_back(component);
+}
+
+void AlienEdit::refresh() {
+	std::vector<const Component *> &q = refreshQueue;
+	if (std::find(q.begin(), q.end(), statusBar.get()) != q.end()) statusBar->refresh();
+	if (std::find(q.begin(), q.end(), menuBar.get()) != q.end()) menuBar->refresh();
+	if (std::find(q.begin(), q.end(), editor.get()) != q.end()) editor->refresh();
+	if (std::find(q.begin(), q.end(), lineNumbers.get()) != q.end()) lineNumbers->refresh();
+	q.clear();
+	editor->focus();
+}
+
+void AlienEdit::refreshAll() {
+	statusBar->refresh();
+	menuBar->refresh();
+	editor->refresh();
+	lineNumbers->refresh();
+	refreshQueue.clear();
+	editor->focus();
+}
+
+std::string AlienEdit::getFile() {
+	return file;
+}
+
+void AlienEdit::readFile() {
 	std::ifstream in;
 	in.open(file);
 	for (std::string line; std::getline(in, line); ) {
 		buffer.push_back(line);
 	}
 	in.close();
+	if (buffer.size() == 0) buffer.push_back("");
 }
 
-void writeToFile() {
+void AlienEdit::writeFile() {
 	std::ofstream out;
 	out.open(file);
-	for (auto &line : buffer) {
+	for (auto line : buffer) {
 		out<<line<<'\n';
 	}
 	out.close();
-	
+
 	statusBar->unsavedChanges = false;
-	statusBar->refresh();
+	queueRefresh(statusBar.get());
 }
