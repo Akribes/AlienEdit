@@ -1,5 +1,12 @@
 #include "utils.h"
 
+const Vector2 &smallestVector(const Vector2 &a, const Vector2 &b) {
+	if (a.y < b.y) return a;
+	else if (a.y > b.y) return b;
+	else if (a.x < b.x) return a;
+	else return b;
+}
+
 size_t digitCount(size_t n) {
 	if (n == 0) return 1;
 	return 1 + floor(log10(n));

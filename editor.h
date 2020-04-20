@@ -16,9 +16,20 @@ class Editor: public Component {
 		Vector2 getStart();
 		Vector2 getCursor();
 
+		void toggleSelect();
+		bool isSelecting();
+		bool hasClipboard();
+		void copy();
+		void cut();
+		void paste();
+
 	private:
 		Vector2 start;
 		Vector2 cursor;
+
+		bool selecting = false;
+		bool clipboard = false;
+		Vector2 selection;
 
 		std::vector<std::string> &buf;
 		size_t taboffset();

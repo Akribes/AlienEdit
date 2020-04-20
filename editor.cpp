@@ -1,5 +1,6 @@
 #include "editor.h"
 #include <iostream>
+#include <sstream>
 
 Editor::Editor(AlienEdit &parent, Vector2 position, Vector2 size, std::vector<std::string> &buffer): Component(parent, position, size), buf(buffer) {
 	keypad(win, TRUE);
@@ -19,6 +20,9 @@ void Editor::refresh() {
 		std::string part = convertTabs(buf[i]);
 		if (part.length() > start.x) mvwaddstr(win, i - start.y, 0, part.substr(start.x, size.x).c_str());
 	}
+
+	if (!selecting) return;
+	
 }
 
 void Editor::focus() {
@@ -109,4 +113,27 @@ Vector2 Editor::getStart() {
 
 Vector2 Editor::getCursor() {
 	return cursor;
+}
+
+void Editor::toggleSelect() {
+	selecting = !selecting;
+	if (selecting) {
+		selection = cursor;
+	}
+	ae.queueRefresh(this);
+}
+
+bool Editor::isSelecting() { return selecting; }
+bool Editor::hasClipboard() { return clipboard; }
+
+void Editor::copy() {
+	clipboard = true;
+}
+void Editor::cut() {
+	clipboard = true;
+}
+void Editor::paste() {}
+
+std::string getClipboard() {
+	return "";
 }

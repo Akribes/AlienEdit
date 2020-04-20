@@ -44,12 +44,12 @@ void AlienEdit::start() {
 					break;
 				case KEY_LEFT:
 				case KEY_UP:
-					menuBar->selection = (menuBar->selection - 1) % menuBar->options();
+					menuBar->moveLeft();
 					queueRefresh(menuBar.get());
 					break;
 				case KEY_RIGHT:
 				case KEY_DOWN:
-					menuBar->selection = (menuBar->selection + 1) % menuBar->options();
+					menuBar->moveRight();
 					queueRefresh(menuBar.get());
 					break;
 			}
